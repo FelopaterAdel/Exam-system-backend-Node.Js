@@ -50,7 +50,7 @@ export const submitExam = async (req, res) => {
 
     const examResult = {
       examId: exam._id,
-      userId: req.user?.id, // Assuming you have user info from auth middleware
+      userId: req.user?.id, 
       answers,
       title:exam.title,
       score,
@@ -58,14 +58,10 @@ export const submitExam = async (req, res) => {
       percentage,
       passed: percentage >= 50,
       submittedAt: new Date(),
-      results // Detailed question-by-question results
+      results
     };
      await Result.create(examResult);
 
-
-    console.log(`Exam completed: ${score}/${totalQuestions} (${percentage}%)`);
-
-    // Return result
     res.status(200).json({
       success: true,
       message: 'Exam submitted successfully',
@@ -75,7 +71,7 @@ export const submitExam = async (req, res) => {
         score,
         totalQuestions,
         percentage,
-        passed: percentage >= 50, // Assuming 60% pass mark
+        passed: percentage >= 50,
         submittedAt: examResult.submittedAt
       }
     });
@@ -89,13 +85,11 @@ export const submitExam = async (req, res) => {
   }
 };
 
-// Additional: Get exam results endpoint
 export const getExamResult = async (req, res) => {
   try {
     const { examId } = req.params;
     const userId = req.user?.id;
 
-    // Find the user's exam result
     const result = await Result.findOne({
       examId,
       userId

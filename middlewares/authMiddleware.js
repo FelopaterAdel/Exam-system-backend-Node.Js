@@ -15,7 +15,9 @@ export const auth = (req, res, next) => {
     req.id = decoded.id;
     req.role = decoded.role;
     req.userId = decoded.id;
+    console.log(req.userId)
     next();
+    
   } catch (err) {
     return res.status(401).json({
       status: 'fail',

@@ -8,7 +8,7 @@ export const createExam = async (req, res) => {
 };
 
 export const getExams = async (req, res) => {
-  const exams = await Exam.find();
+  const exams = req.exams;
   res.json(exams);
 };
 

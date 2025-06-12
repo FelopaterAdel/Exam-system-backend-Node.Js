@@ -4,7 +4,7 @@ import { auth, restrictToExamParticipants} from '../middlewares/authMiddleware.j
 
 const router = express.Router(); 
  
-router.post('/:examId', submitExam);
-router.get('/:examId', getExamResult);
+router.post('/:examId',auth, submitExam);
+router.get('/:examId',auth,restrictToExamParticipants, getExamResult);
 
 export default router;
