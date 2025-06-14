@@ -93,10 +93,51 @@ export const getExamById = async (req, res) => {
   }
 };
 export const editExam = async (req, res) => {
-  const newExam =req.body;
-  let exam = await Exam.findByIdAndUpdate(req.params.id,newExam ,{new:true});
-  res.json(exam);
+  try {
+    const { title, questions, students } = req.body;
+
+    const studentDocs = await User.find({ email: { $in: students } });
+
+    if (studentDocs.length !== students.length) {
+      return res.status(404).json({
+        message: " student emails not found",
+        found: studentDocs.map(s => s.email),
+      });
+    }
+
+    const studentIds = studentDocs.map((student) => student._id);
+
+    const updatedExam = await Exam.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        questions,
+        students: studentIds,
+      },
+      { new: true }
+    )
+      .populate("students", "email")
+      .populate("teacherId", "email");
+
+    if (!updatedExam) {
+      return res.status(404).json({ message: "Exam not found" });
+    }
+
+    const simplifiedExam = {
+      _id: updatedExam._id,
+      title: updatedExam.title,
+      questions: updatedExam.questions,
+      students: updatedExam.students.map(s => s.email),
+      teacherEmail: updatedExam.teacherId?.email || null,
+    };
+
+    res.json(simplifiedExam);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
+
 export const deleteExam = async (req, res) => {
   let exam = await Exam.findByIdAndDelete(req.params.id)
   if (exam) {
